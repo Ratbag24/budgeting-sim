@@ -1,6 +1,6 @@
 # budget_simulator_v2.py
 # Budget Simulator (CLI) - V2
-# Adds: (A) Savings goal + hit month/date, (C) CSV export
+#  Savings goal + hit month/date, CSV export (added) 
 
 from __future__ import annotations
 from datetime import date
@@ -172,4 +172,5 @@ def main():
             print(f"❌ Could not write CSV file: {e}")
 
 if __name__ == "__main__":
+
     main()
