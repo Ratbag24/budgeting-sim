@@ -1,7 +1,7 @@
 {
-  "name": "money-saver",
+  "name": "pence",
   "version": "1.0.0",
-  "description": "A money-saving and budget projection app",
+  "description": "Every pence counts — project your savings and track your goals",
   "private": true,
   "scripts": {
     "sync": "cap sync",

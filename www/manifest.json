@@ -1,7 +1,7 @@
 {
-  "name": "Money Saver",
-  "short_name": "MoneySaver",
-  "description": "Project your savings and track your financial goals",
+  "name": "Pence",
+  "short_name": "Pence",
+  "description": "Every pence counts — project your savings and track your goals",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait-primary",

@@ -1,6 +1,6 @@
 {
-  "appId": "com.moneysaver.app",
-  "appName": "Money Saver",
+  "appId": "app.getpence.pence",
+  "appName": "Pence",
   "webDir": "www",
   "server": {
     "androidScheme": "https"
