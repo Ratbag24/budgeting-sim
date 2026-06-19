@@ -1,0 +1,13 @@
+{
+  "appId": "app.getpence.pence",
+  "appName": "Pence",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  }
+}
