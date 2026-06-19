@@ -1,7 +1,7 @@
 {
   "appId": "app.getpence.pence",
   "appName": "Pence",
-  "webDir": "www",
+  "webDir": "docs",
   "server": {
     "androidScheme": "https"
   },
