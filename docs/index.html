@@ -517,12 +517,33 @@
     document.getElementById("results").classList.add("visible");
   });
 
-  // Auto-calculate on load with defaults
+  const INPUT_IDS = ["hourly","baseHours","otHours","otMult","taxPct","outgoings","loans","isaWeekly","startSavings","months","goal"];
+
+  function saveInputs() {
+    const data = {};
+    INPUT_IDS.forEach(id => data[id] = document.getElementById(id).value);
+    localStorage.setItem("pence_inputs", JSON.stringify(data));
+  }
+
+  function loadInputs() {
+    try {
+      const data = JSON.parse(localStorage.getItem("pence_inputs"));
+      if (!data) return false;
+      INPUT_IDS.forEach(id => { if (data[id] !== undefined) document.getElementById(id).value = data[id]; });
+      return true;
+    } catch { return false; }
+  }
+
+  // Load saved inputs or fall back to defaults, then calculate
+  loadInputs();
   document.getElementById("calc-btn").click();
 
-  // Live recalculate as user types
+  // Live recalculate and save as user types
   document.querySelectorAll("input").forEach(el => {
-    el.addEventListener("input", () => document.getElementById("calc-btn").click());
+    el.addEventListener("input", () => {
+      saveInputs();
+      document.getElementById("calc-btn").click();
+    });
   });
 
   if ("serviceWorker" in navigator) {
