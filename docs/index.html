@@ -660,6 +660,13 @@
     const leftover     = netMonth - totalExp;
     const monthlyRate  = Math.pow(1 + interestRate / 100, 1 / 12) - 1;
 
+    const avgExtra = extraIncomes.reduce((sum, inc) => {
+      const amt = inc.amount || 0;
+      if (inc.freqMonths === 0) return sum + amt * (WEEKS_PER_YEAR / MONTHS_PER_YEAR);
+      return inc.freqMonths > 0 ? sum + amt / inc.freqMonths : sum;
+    }, 0);
+    const totalLeftover = leftover + avgExtra;
+
     // KPIs (interest earned appended after projection loop)
     const kpiGrid = document.getElementById("kpi-grid");
     const kpis = [
@@ -668,8 +675,11 @@
       { label: "NI / year",         value: `£${fmt(ni)}`,               cls: "red" },
       { label: "Net / year",        value: `£${fmt(netYear)}`,          cls: "" },
       { label: "Net / month",       value: `£${fmt(netMonth)}`,         cls: "" },
-      { label: "Monthly leftover",  value: `£${fmt(leftover)}`,         cls: leftover < 0 ? "red" : "green" },
+      { label: "Monthly leftover",  value: `£${fmt(totalLeftover)}`,    cls: totalLeftover < 0 ? "red" : "green" },
     ];
+    if (avgExtra > 0) {
+      kpis.splice(5, 0, { label: "Extra income / mo", value: `£${fmt(avgExtra)}`, cls: "green" });
+    }
 
     // Projection
     const today = new Date();
