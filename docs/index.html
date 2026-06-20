@@ -392,8 +392,7 @@
         <input type="number" id="otMult" min="1" step="0.1" value="1.5" />
       </div>
       <div class="field">
-        <label>Tax / NI estimate (%)</label>
-        <input type="number" id="taxPct" min="0" max="100" step="0.1" value="22" />
+        <label style="font-size:0.8rem;color:var(--muted)">UK Income Tax &amp; NI calculated automatically using 2024/25 brackets (personal allowance £12,570)</label>
       </div>
     </div>
 
@@ -517,8 +516,21 @@
   const WEEKS_PER_YEAR = 52;
   const MONTHS_PER_YEAR = 12;
 
+  function calcUKTax(grossAnnual) {
+    const PA = 12570, BR_LIMIT = 50270, HR_LIMIT = 125140;
+    let tax = 0;
+    if (grossAnnual > PA) tax += (Math.min(grossAnnual, BR_LIMIT) - PA) * 0.20;
+    if (grossAnnual > BR_LIMIT) tax += (Math.min(grossAnnual, HR_LIMIT) - BR_LIMIT) * 0.40;
+    if (grossAnnual > HR_LIMIT) tax += (grossAnnual - HR_LIMIT) * 0.45;
+    const NI_PT = 12570, NI_UEL = 50270;
+    let ni = 0;
+    if (grossAnnual > NI_PT) ni += (Math.min(grossAnnual, NI_UEL) - NI_PT) * 0.08;
+    if (grossAnnual > NI_UEL) ni += (grossAnnual - NI_UEL) * 0.02;
+    return { tax, ni, total: tax + ni };
+  }
+
   // Additional income sources
-  let extraIncomes = [
+  var extraIncomes = [
     { label: "Child benefits", amount: 0, freqMonths: 1 },
     { label: "Solar panel",    amount: 0, freqMonths: 3 },
   ];
@@ -596,7 +608,6 @@
     const baseHours   = get("baseHours");
     const otHours     = get("otHours");
     const otMult      = get("otMult");
-    const taxPct      = get("taxPct");
     const expValues   = EXP_CATEGORIES.map(c => ({ ...c, value: get(c.id) }));
     const outgoings   = expValues.reduce((s, c) => s + c.value, 0);
     const loans       = get("loans");
@@ -610,25 +621,24 @@
     const shiftPct     = get("shiftRate");
     const grossWeek    = hourly * (1 + shiftPct / 100) * baseHours + hourly * otMult * otHours;
     const grossMonth   = grossWeek * (WEEKS_PER_YEAR / MONTHS_PER_YEAR);
-    const netMonth     = grossMonth * (1 - taxPct / 100);
+    const grossYear    = grossMonth * MONTHS_PER_YEAR;
+    const { tax: incomeTax, ni, total: totalDeductions } = calcUKTax(grossYear);
+    const netYear      = grossYear - totalDeductions;
+    const netMonth     = netYear / MONTHS_PER_YEAR;
     const isaMonth     = isaWeekly * (WEEKS_PER_YEAR / MONTHS_PER_YEAR);
     const totalExp     = outgoings + loans + isaMonth;
     const leftover     = netMonth - totalExp;
     const monthlyRate  = Math.pow(1 + interestRate / 100, 1 / 12) - 1;
 
-    const grossYear = grossMonth * MONTHS_PER_YEAR;
-    const netYear   = netMonth   * MONTHS_PER_YEAR;
-    const taxPaid   = grossYear  - netYear;
-
     // KPIs (interest earned appended after projection loop)
     const kpiGrid = document.getElementById("kpi-grid");
     const kpis = [
-      { label: "Gross / year",    value: `£${fmt(grossYear)}`,  cls: "" },
-      { label: "Tax & NI / year", value: `£${fmt(taxPaid)}`,    cls: "red" },
-      { label: "Net / year",      value: `£${fmt(netYear)}`,    cls: "" },
-      { label: "Gross / month",   value: `£${fmt(grossMonth)}`, cls: "" },
-      { label: "Net / month",     value: `£${fmt(netMonth)}`,   cls: "" },
-      { label: "Monthly leftover",value: `£${fmt(leftover)}`,   cls: leftover < 0 ? "red" : "green" },
+      { label: "Gross / year",      value: `£${fmt(grossYear)}`,        cls: "" },
+      { label: "Income Tax / year", value: `£${fmt(incomeTax)}`,        cls: "red" },
+      { label: "NI / year",         value: `£${fmt(ni)}`,               cls: "red" },
+      { label: "Net / year",        value: `£${fmt(netYear)}`,          cls: "" },
+      { label: "Net / month",       value: `£${fmt(netMonth)}`,         cls: "" },
+      { label: "Monthly leftover",  value: `£${fmt(leftover)}`,         cls: leftover < 0 ? "red" : "green" },
     ];
 
     // Projection
@@ -776,7 +786,7 @@
     document.getElementById("results").classList.add("visible");
   });
 
-  const INPUT_IDS = ["hourly","shiftRate","baseHours","otHours","otMult","taxPct","exp_rent","exp_food","exp_utils","exp_transport","exp_subs","exp_other","loans","isaWeekly","startSavings","interestRate","months","goal"];
+  const INPUT_IDS = ["hourly","shiftRate","baseHours","otHours","otMult","exp_rent","exp_food","exp_utils","exp_transport","exp_subs","exp_other","loans","isaWeekly","startSavings","interestRate","months","goal"];
 
   function saveAll() {
     const data = {};
