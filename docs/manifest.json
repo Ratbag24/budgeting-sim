@@ -2,7 +2,7 @@
   "name": "Pence",
   "short_name": "Pence",
   "description": "Every pence counts — project your savings and track your goals",
-  "start_url": "/",
+  "start_url": "/pence/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#0f1117",
