@@ -172,6 +172,34 @@
     }
 
     .kpi-value.green { color: var(--green); }
+
+    .pay-breakdown {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 20px;
+    }
+    .pay-breakdown .section-title { margin-bottom: 14px; }
+    .pb-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 7px 0;
+      font-size: 0.95rem;
+    }
+    .pb-row + .pb-row { border-top: 1px solid var(--border); }
+    .pb-row.pb-total {
+      border-top: 2px solid var(--border);
+      margin-top: 4px;
+      padding-top: 11px;
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+    .pb-label { color: var(--muted); }
+    .pb-label.indent { padding-left: 14px; }
+    .pb-amount { font-weight: 600; }
+    .pb-sub { font-size: 0.78rem; color: var(--muted); margin-left: 8px; font-weight: 400; }
     .kpi-value.red { color: var(--red); }
     .kpi-value.amber { color: var(--amber); }
 
@@ -478,6 +506,8 @@
 
       <div class="kpi-grid" id="kpi-grid"></div>
 
+      <div class="pay-breakdown" id="pay-breakdown"></div>
+
       <div id="goal-banner" class="goal-banner"></div>
 
       <div class="charts-row">
@@ -685,6 +715,27 @@
       `<div class="kpi"><div class="kpi-label">${k.label}</div>
        <div class="kpi-value ${k.cls}">${k.value}</div></div>`
     ).join("");
+
+    // Pay breakdown card
+    const effRate = grossYear > 0 ? ((totalDeductions / grossYear) * 100).toFixed(1) : "0.0";
+    document.getElementById("pay-breakdown").innerHTML = `
+      <div class="section-title">Pay Breakdown</div>
+      <div class="pb-row">
+        <span class="pb-label">Gross Pay</span>
+        <span class="pb-amount">£${fmt(grossYear)} / yr<span class="pb-sub">£${fmt(grossMonth)} / mo</span></span>
+      </div>
+      <div class="pb-row">
+        <span class="pb-label indent">− Income Tax</span>
+        <span class="pb-amount" style="color:var(--red)">£${fmt(incomeTax)} / yr</span>
+      </div>
+      <div class="pb-row">
+        <span class="pb-label indent">− National Insurance</span>
+        <span class="pb-amount" style="color:var(--red)">£${fmt(ni)} / yr</span>
+      </div>
+      <div class="pb-row pb-total">
+        <span class="pb-label" style="color:var(--text)">Take-Home Pay<span class="pb-sub">${effRate}% effective deduction rate</span></span>
+        <span class="pb-amount" style="color:var(--green)">£${fmt(netYear)} / yr<span class="pb-sub">£${fmt(netMonth)} / mo</span></span>
+      </div>`;
 
     // Goal banner
     const banner = document.getElementById("goal-banner");
